@@ -1,3 +1,7 @@
+# Lotsch and Ultsch, 2023
+# For Windows system, please replace "pbmcapply::pbmclapply" with "lapply"
+# The speed will be slow on Windows systems, or the parallel processing needs to be re-implemented in a Windows compatible manner
+
 #################################### Libraries ########################################################################
 
 library(parallel)
@@ -129,6 +133,7 @@ for (ActualDataSet in DataSets) {
   dfBAs <- do.call(cbind.data.frame, lapply(names(BAArch), function(x) unlist(BAArch[[x]]$ClassificationResultsNN)))
   names(dfBAs) <- names(BAArch)
 
+  #################################### Train and validate binary logistic regression ########################################################################
 
   ClassificationResultsReg <- pbmcapply::pbmclapply(list.of.seeds, function(x) {
     set.seed(x)
@@ -161,6 +166,8 @@ for (ActualDataSet in DataSets) {
   dfBAs["Regression"] <- unlist(ClassificationResultsReg)
   dfBAs_long <- reshape2::melt(dfBAs)
 
+  #################################### Prepare pot per scenario  ########################################################################
+
   assign(
     paste0("pBAs_", ActualDataSet),
     ggplot(data = dfBAs_long, aes(x = variable, y = value, group = variable)) +
@@ -180,31 +187,9 @@ for (ActualDataSet in DataSets) {
       labs(title = "Original data (2 classes)") +
       theme_light()
   )
-
-  assign(
-    paste0("pNN_", ActualDataSet),
-    plot_grid(
-      plot_grid(
-        BAArch$N0$pic,
-        BAArch$N1$pic,
-        BAArch$N2$pic,
-        BAArch$N3$pic,
-        labels = LETTERS[1:4],
-        nrow = 1,
-        align = "v", axis = "tb"
-      ),
-      plot_grid(
-        get(paste0("pActualData_", ActualDataSet)),
-        get(paste0("pBAs_", ActualDataSet)),
-        labels = LETTERS[5:6],
-        align = "v", axis = "tb",
-        nrow = 1
-      ),
-      nrow = 2
-    )
-  )
-  print(get(paste0("pNN_", ActualDataSet)))
 }
+
+#################################### Plot the final results ########################################################################
 
 plot_grid(
   plot_grid(
