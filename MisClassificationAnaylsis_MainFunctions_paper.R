@@ -16,9 +16,14 @@ library(ComplexHeatmap)
 library(e1071)
 library(nnet)
 library(doParallel)
-
+library(gridGraphics)
 
 #################################### Functions ########################################################################
+grab_grob <- function() {
+    grid.echo()
+    grid.grab()
+}
+
 plot_rawData <- function(Data) {
     colors_a <- colors[as.numeric(Data$Cls)]
     if (ncol(within(Data, rm(Cls))) == 3) {
@@ -36,12 +41,6 @@ plot_rawData <- function(Data) {
     pic <- grab_grob()
     return(pic)
 }
-
-grab_grob <- function() {
-    grid.echo()
-    grid.grab()
-}
-
 
 multiClassSummary <- function(data, lev = NULL, model = NULL) {
     # Load Libraries
